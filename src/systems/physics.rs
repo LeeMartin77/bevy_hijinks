@@ -2,6 +2,9 @@ use bevy::prelude::*;
 use crate::components::entities;
 use crate::components::physical_attributes as phys;
 
+//https://en.wikipedia.org/wiki/Gravitational_constant
+pub const GRAVITATIONAL_CONSTANT: f32 = 0.00000000006674f32; //* (10f32).powi(-11);
+
 pub fn gravity_system(
     time: Res<Time>,
     mut set: QuerySet<(
@@ -14,6 +17,8 @@ pub fn gravity_system(
     if let Ok((planet_gravity, planet_transform, _planet)) = set.q0().single() {
         //Some cheating is going on here:
         // - Only one planet
+        // Instead, in the future we're probably going to want to find the planet exerting the greatest force on a point
+        // because we aren't going to try and solve the n body problem, we're just making a game.
         if let phys::Gravity::Immovable(pmr) = planet_gravity {
             planet_mass_radius.mass = pmr.mass;
             planet_mass_radius.radius = pmr.radius;
@@ -31,10 +36,7 @@ pub fn gravity_system(
                 velocity.velocity.z = 0.0;
                 continue;
             }
-            //We should definitely not be calcing this constantly.
-            //https://en.wikipedia.org/wiki/Gravitational_constant
-            let gravitational_constant: f32 = 6.674f32 * (10f32).powi(-11);
-            let force = gravitational_constant * ((object_mass_radius.mass * planet_mass_radius.mass) / distance_between_objects.powi(2));
+            let force = GRAVITATIONAL_CONSTANT * ((object_mass_radius.mass * planet_mass_radius.mass) / distance_between_objects.powi(2));
             //F=MA
             //A = F/M
             let acceleration = force / object_mass_radius.mass;
