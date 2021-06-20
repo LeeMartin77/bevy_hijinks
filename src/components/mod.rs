@@ -1,2 +1,2 @@
 pub mod entities;
-pub mod physics;
+pub mod physical_attributes;
