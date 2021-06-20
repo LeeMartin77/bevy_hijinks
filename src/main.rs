@@ -1,5 +1,8 @@
+mod components;
+
 use bevy::prelude::*;
-use bevy::math::Vec2;
+
+use crate::components::*;
 
 fn main() {
     App::build()
@@ -20,7 +23,7 @@ fn setup(
 
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 
-    let player_radius = 100.0;
+    let player_radius = 10.0;
     commands
         .spawn_bundle(SpriteBundle {
             material: materials.add(Color::rgb(140.0, 140.0, 140.0).into()),
@@ -28,15 +31,15 @@ fn setup(
             sprite: Sprite::new(Vec2::new(player_radius, player_radius)),
             ..Default::default()
         })
-        .insert(Player {})
-        .insert(Thrust {
+        .insert(entities::Player {})
+        .insert(physics::Thrust {
             thrust: 0.0,
             facing: 0.0,
         })
-        .insert(Velocity {
+        .insert(physics::Velocity {
             velocity: Vec3::new(150.0, 0.0, 0.0),
         })
-        .insert(Gravity::Movable(MassRadius {
+        .insert(physics::Gravity::Movable(physics::MassRadius {
             radius: player_radius,
             mass: 0.001
         }));
@@ -49,39 +52,14 @@ fn setup(
             sprite: Sprite::new(Vec2::new(planet_radius, planet_radius)),
             ..Default::default()
         })
-        .insert(Planet {
+        .insert(entities::Planet {
         })
-        .insert(Gravity::Immovable(MassRadius {
+        .insert(physics::Gravity::Immovable(physics::MassRadius {
             radius: planet_radius,
             mass: 500.0 * (10f32).powi(14)
         }));
 }
 
-struct MassRadius {
-    mass: f32,
-    radius: f32
-}
-
-struct Velocity {
-    velocity: Vec3
-}
-
-struct Thrust {
-    thrust: f32,
-    facing: f32
-}
-
-enum Gravity {
-    Movable(MassRadius),
-    Immovable(MassRadius)
-}
-
-struct Player {
-}
-
-
-struct Planet {
-}
 
 const PLAYER_ACCELERATION_RATE: f32 = 50.0;
 const PLAYER_TURN_RATE: f32 = 10.0;
@@ -89,7 +67,7 @@ const PLAYER_TURN_RATE: f32 = 10.0;
 fn player_input_system(
     time: Res<Time>,
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<(&Player, &mut Thrust)>,
+    mut query: Query<(&entities::Player, &mut physics::Thrust)>,
 ) {
     if let Ok((_player, mut thrust)) = query.single_mut() {
         if keyboard_input.pressed(KeyCode::Left) {
@@ -117,16 +95,16 @@ fn player_input_system(
 fn gravity_system(
     time: Res<Time>,
     mut set: QuerySet<(
-        Query<(&Gravity, &Transform, &Planet)>,
-        Query<(&Gravity, &Transform, &mut Velocity)>
+        Query<(&physics::Gravity, &Transform, &entities::Planet)>,
+        Query<(&physics::Gravity, &Transform, &mut physics::Velocity)>
     )>
 ) {
-    let mut planet_mass_radius = MassRadius { mass: 0.0, radius: 0.0 };
+    let mut planet_mass_radius = physics::MassRadius { mass: 0.0, radius: 0.0 };
     let mut planet_translation = Vec3::new(0.0, 0.0, 0.0);
     if let Ok((planet_gravity, planet_transform, _planet)) = set.q0().single() {
         //Some cheating is going on here:
         // - Only one planet
-        if let Gravity::Immovable(pmr) = planet_gravity {
+        if let physics::Gravity::Immovable(pmr) = planet_gravity {
             planet_mass_radius.mass = pmr.mass;
             planet_mass_radius.radius = pmr.radius;
             planet_translation.x = planet_transform.translation.x;
@@ -134,7 +112,7 @@ fn gravity_system(
         }
     }
     for (object_gravity, object_transform, mut velocity) in set.q1_mut().iter_mut() {
-        if let Gravity::Movable(object_mass_radius) = object_gravity {
+        if let physics::Gravity::Movable(object_mass_radius) = object_gravity {
             let distance_between_objects = distance_between_two_vec(planet_translation, object_transform.translation);
             if distance_between_objects <= (planet_mass_radius.radius + object_mass_radius.radius) {
                 // object has crashed - it needs to stop moving
@@ -161,7 +139,7 @@ fn gravity_system(
 
 fn thrust_system(
     time: Res<Time>,
-    mut query: Query<(&Thrust, &mut Velocity)>
+    mut query: Query<(&physics::Thrust, &mut physics::Velocity)>
 ) {
     for (thrust, mut velocity) in query.iter_mut() {
         if thrust.thrust > 0.0 {
@@ -172,7 +150,7 @@ fn thrust_system(
 
 fn velocity_system(
     time: Res<Time>,
-    mut query: Query<(&mut Transform, &Velocity)>
+    mut query: Query<(&mut Transform, &physics::Velocity)>
 ) {
     for (mut transform, velocity) in query.iter_mut() {
         transform.translation += time.delta_seconds() * velocity.velocity;
