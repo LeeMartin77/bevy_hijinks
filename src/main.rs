@@ -9,7 +9,7 @@ use crate::systems::*;
 fn main() {
     App::build()
         .add_plugins(DefaultPlugins)
-        .insert_resource(ClearColor(Color::rgb(0.9, 0.9, 0.9)))
+        .insert_resource(ClearColor(Color::rgb(0.7, 0.7, 0.7)))
         .add_startup_system(setup::setup.system())
         .add_system(input::player_input_system.system())
         .add_system(physics::thrust_system.system())

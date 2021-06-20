@@ -3,8 +3,8 @@ use bevy::prelude::*;
 use crate::entities;
 use crate::physical_attributes;
 
-const PLAYER_ACCELERATION_RATE: f32 = 50.0;
-const PLAYER_TURN_RATE: f32 = 10.0;
+const PLAYER_ACCELERATION_RATE: f32 = 5.0;
+const PLAYER_TURN_RATE: f32 = 1.0;
 
 pub fn player_input_system(
     time: Res<Time>,
