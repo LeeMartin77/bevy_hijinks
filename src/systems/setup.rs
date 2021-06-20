@@ -4,20 +4,24 @@ use crate::components::*;
 
 pub fn setup(
     mut commands: Commands,
-    mut materials: ResMut<Assets<ColorMaterial>>
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-
     let player_radius = 10.0;
     commands
-        .spawn_bundle(SpriteBundle {
-            material: materials.add(Color::rgb(140.0, 140.0, 140.0).into()),
+        .spawn_bundle(PbrBundle {
+            material: materials.add(StandardMaterial { 
+                base_color: Color::rgb(140.0, 140.0, 140.0).into(),
+                ..Default::default()
+            }),
             transform: Transform::from_xyz(0.0, 150.0, 0.0),
-            sprite: Sprite::new(Vec2::new(player_radius, player_radius)),
+            mesh: meshes.add(Mesh::from(shape::Icosphere { 
+                radius: player_radius, 
+                subdivisions: 32, 
+            })),
             ..Default::default()
         })
-        .insert(entities::Player {})
+        .insert(entities::Player { })
         .insert(physical_attributes::Thrust {
             thrust: 0.0,
             facing: 0.0,
@@ -32,16 +36,32 @@ pub fn setup(
         
     let planet_radius = 100.0;
     commands
-        .spawn_bundle(SpriteBundle {
-            material: materials.add(Color::rgb(0.0, 0.0, 0.0).into()),
+        .spawn_bundle(PbrBundle {
+            material: materials.add(StandardMaterial { 
+                base_color: Color::rgb(0.0, 0.0, 0.0).into(),
+                ..Default::default()
+            }),
             transform: Transform::from_xyz(0.0, 0.0, 0.0),
-            sprite: Sprite::new(Vec2::new(planet_radius, planet_radius)),
+            mesh: meshes.add(Mesh::from(shape::Icosphere { 
+                radius: planet_radius, 
+                subdivisions: 32, 
+            })),
             ..Default::default()
         })
-        .insert(entities::Planet {
-        })
+        .insert(entities::Planet { })
         .insert(physical_attributes::Gravity::Immovable(physical_attributes::MassRadius {
             radius: planet_radius,
             mass: 500.0 * (10f32).powi(14)
         }));
+
+    let mut camera = OrthographicCameraBundle::new_3d();
+    camera.orthographic_projection.scale = 500.0;
+    camera.transform = Transform::from_xyz(0.0, 0.0, 250.0).looking_at(Vec3::ZERO, Vec3::Y);
+
+    commands.spawn_bundle(camera);
+    
+    commands.spawn_bundle(LightBundle {
+        transform: Transform::from_xyz(0.0, 0.0, 700.0),
+        ..Default::default()
+    });
 }
