@@ -5,7 +5,7 @@ use crate::components::physical_attributes as phys;
 //https://en.wikipedia.org/wiki/Gravitational_constant
 pub const GRAVITATIONAL_CONSTANT: f32 = 0.00000000006674f32; //* (10f32).powi(-11);
 
-const STARTUP_DELAY: f64 = 0.5;
+const STARTUP_DELAY: f64 = 1.5;
 
 pub fn gravity_system(
     time: Res<Time>,
@@ -18,21 +18,28 @@ pub fn gravity_system(
     if time.seconds_since_startup() < STARTUP_DELAY {
         return;
     }
-    let mut planet_mass_radius = phys::MassRadius { mass: 0.0, radius: 0.0 };
-    let mut planet_translation = Vec3::new(0.0, 0.0, 0.0);
-    if let Ok((planet_gravity, planet_transform, _planet)) = set.q0().single() {
-        //Some cheating is going on here:
-        // - Only one planet
-        // Instead, in the future we're probably going to want to find the planet exerting the greatest force on a point
-        // because we aren't going to try and solve the n body problem, we're just making a game.
+
+
+    //I'm sure there is a tider/rustier way of doing this, but we're gaining some pre-munging of data anyway here.
+    let mut planets = Vec::new();
+    for (planet_gravity, planet_transform, _planet) in set.q0().iter() {
         if let phys::Gravity::Immovable(pmr) = planet_gravity {
-            planet_mass_radius.mass = pmr.mass;
-            planet_mass_radius.radius = pmr.radius;
-            planet_translation.x = planet_transform.translation.x;
-            planet_translation.y = planet_transform.translation.y;
+            planets.push(
+                (phys::MassRadius{ mass: pmr.mass, radius: pmr.radius } , 
+                    Vec3::new(planet_transform.translation.x, planet_transform.translation.y, 0.0) ));
         }
     }
+
     for (object_gravity, object_transform, mut velocity) in set.q1_mut().iter_mut() {
+        let mut planet_mass_radius = phys::MassRadius { mass: 0.0, radius: 0.0 };
+        let mut planet_translation = Vec3::new(0.0, 0.0, 0.0);
+        for (pmr, planet_position) in &planets {
+                planet_mass_radius.mass = pmr.mass;
+                planet_mass_radius.radius = pmr.radius;
+                planet_translation.x = planet_position.x;
+                planet_translation.y = planet_position.y;
+        }
+
         if let phys::Gravity::Movable(object_mass_radius) = object_gravity {
             let distance_between_objects = distance_between_two_vec(planet_translation, object_transform.translation);
             if distance_between_objects <= (planet_mass_radius.radius + object_mass_radius.radius) {
