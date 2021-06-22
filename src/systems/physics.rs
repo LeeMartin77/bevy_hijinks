@@ -5,7 +5,7 @@ use crate::components::physical_attributes as phys;
 //https://en.wikipedia.org/wiki/Gravitational_constant
 pub const GRAVITATIONAL_CONSTANT: f32 = 0.00000000006674f32; //* (10f32).powi(-11);
 
-const STARTUP_DELAY: f64 = 1.5;
+const STARTUP_DELAY: f64 = 2.5;
 
 pub fn gravity_system(
     time: Res<Time>,
@@ -33,11 +33,17 @@ pub fn gravity_system(
     for (object_gravity, object_transform, mut velocity) in set.q1_mut().iter_mut() {
         let mut planet_mass_radius = phys::MassRadius { mass: 0.0, radius: 0.0 };
         let mut planet_translation = Vec3::new(0.0, 0.0, 0.0);
+        let mut greatest_force_on_player_point = 0.0;
         for (pmr, planet_position) in &planets {
+            let planet_force_on_player_point = planet_force_on_point(object_transform.translation, *planet_position, pmr.mass);
+            if planet_force_on_player_point > greatest_force_on_player_point
+            {
+                greatest_force_on_player_point = planet_force_on_player_point;
                 planet_mass_radius.mass = pmr.mass;
                 planet_mass_radius.radius = pmr.radius;
                 planet_translation.x = planet_position.x;
                 planet_translation.y = planet_position.y;
+            }
         }
 
         if let phys::Gravity::Movable(object_mass_radius) = object_gravity {
@@ -107,4 +113,9 @@ fn angle_between_two_vec(sourcevec: Vec3, targetvec: Vec3) -> f32 {
 fn distance_between_two_vec(vecone: Vec3, vectwo: Vec3) -> f32{
     let vec = vecone - vectwo;
     ((vec.x * vec.x) + (vec.y * vec.y)).abs().sqrt()
+}
+
+// Not a true force-on-point, it's quickmath.
+fn planet_force_on_point(forcepoint: Vec3, planetlocation: Vec3, planet_mass: f32) -> f32 {
+    planet_mass / distance_between_two_vec(forcepoint, planetlocation).powi(2)
 }
