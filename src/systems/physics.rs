@@ -5,6 +5,8 @@ use crate::components::physical_attributes as phys;
 //https://en.wikipedia.org/wiki/Gravitational_constant
 pub const GRAVITATIONAL_CONSTANT: f32 = 0.00000000006674f32; //* (10f32).powi(-11);
 
+const STARTUP_DELAY: f64 = 0.5;
+
 pub fn gravity_system(
     time: Res<Time>,
     mut set: QuerySet<(
@@ -12,6 +14,10 @@ pub fn gravity_system(
         Query<(&phys::Gravity, &Transform, &mut phys::Velocity)>
     )>
 ) {
+
+    if time.seconds_since_startup() < STARTUP_DELAY {
+        return;
+    }
     let mut planet_mass_radius = phys::MassRadius { mass: 0.0, radius: 0.0 };
     let mut planet_translation = Vec3::new(0.0, 0.0, 0.0);
     if let Ok((planet_gravity, planet_transform, _planet)) = set.q0().single() {
@@ -53,6 +59,10 @@ pub fn thrust_system(
     time: Res<Time>,
     mut query: Query<(&phys::Thrust, &mut phys::Velocity)>
 ) {
+
+    if time.seconds_since_startup() < STARTUP_DELAY {
+        return;
+    }
     for (thrust, mut velocity) in query.iter_mut() {
         if thrust.thrust > 0.0 {
             velocity.velocity += time.delta_seconds() * (thrust.thrust * vec_from_angle(thrust.facing));
@@ -64,6 +74,10 @@ pub fn velocity_system(
     time: Res<Time>,
     mut query: Query<(&mut Transform, &phys::Velocity)>
 ) {
+
+    if time.seconds_since_startup() < STARTUP_DELAY {
+        return;
+    }
     for (mut transform, velocity) in query.iter_mut() {
         transform.translation += time.delta_seconds() * velocity.velocity;
     }
