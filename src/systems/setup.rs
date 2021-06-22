@@ -56,6 +56,21 @@ pub fn setup(
             mass: 5.0 * (10f32).powi(13)
         }));
 
+    commands
+        .spawn_bundle(
+            GeometryBuilder::build_as(
+                &planet_circle,
+                ShapeColors::new(Color::BLACK),
+                DrawMode::Fill(FillOptions::default()),
+                Transform::from_xyz(45.0, 0.0, 0.0),
+            )
+        )
+        .insert(entities::Planet { })
+        .insert(physical_attributes::Gravity::Immovable(physical_attributes::MassRadius {
+            radius: planet_radius,
+            mass: 5.0 * (10f32).powi(13)
+        }));
+
     let mut camera = OrthographicCameraBundle::new_2d();
     camera.orthographic_projection.scale = 0.1;
     camera.transform = Transform::from_xyz(0.0, 0.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y);
