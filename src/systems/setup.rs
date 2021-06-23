@@ -36,6 +36,7 @@ pub fn setup(
         }));
         
     let planet_radius = 10.0;
+    let planet_density = 12000000000.0;
 
     let planet_circle = shapes::Circle {
         radius: planet_radius,
@@ -51,10 +52,7 @@ pub fn setup(
             )
         )
         .insert(entities::Planet { })
-        .insert(physical_attributes::Gravity::Immovable(physical_attributes::MassRadius {
-            radius: planet_radius,
-            mass: 5.0 * (10f32).powi(13)
-        }));
+        .insert(physical_attributes::Gravity::Immovable(physical_attributes::MassRadius::from_density(planet_density, planet_radius)));
 
     commands
         .spawn_bundle(
@@ -66,10 +64,7 @@ pub fn setup(
             )
         )
         .insert(entities::Planet { })
-        .insert(physical_attributes::Gravity::Immovable(physical_attributes::MassRadius {
-            radius: planet_radius,
-            mass: 5.0 * (10f32).powi(13)
-        }));
+        .insert(physical_attributes::Gravity::Immovable(physical_attributes::MassRadius::from_density(planet_density, planet_radius)));
 
     let mut camera = OrthographicCameraBundle::new_2d();
     camera.orthographic_projection.scale = 0.1;

@@ -5,6 +5,16 @@ pub struct MassRadius {
     pub radius: f32
 }
 
+impl MassRadius {
+    pub fn from_density(density: f32, radius: f32) -> MassRadius {
+        let volume: f32 = (4.0/3.0) * 3.14 * (radius * radius * radius);
+        MassRadius {
+            radius,
+            mass: density * volume
+        }
+    }
+}
+
 pub enum Gravity {
     Movable(MassRadius),
     Immovable(MassRadius)
