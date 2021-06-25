@@ -29,15 +29,15 @@ fn add_camera(mut commands: Commands) -> Commands {
 fn add_player(mut commands: Commands) -> Commands {
     let player_radius = 1.0;
 
-    let player_circle = shapes::Circle {
-        radius: player_radius,
-        ..shapes::Circle::default()
+    let player_circle = shapes::Polygon {
+        closed: true,
+        points: vec!(Vec2::new(0.0, 1.0), Vec2::new(1.0, 0.5), Vec2::new(1.0, -1.0), Vec2::new(-1.0, -1.0), Vec2::new(-1.0, 0.5))
     };
     commands
         .spawn_bundle(
             GeometryBuilder::build_as(
                 &player_circle,
-                ShapeColors::new(Color::TEAL),
+                ShapeColors::new(Color::BLACK),
                 DrawMode::Fill(FillOptions::default()),
                 Transform::from_xyz(0.0, 15.0, 0.0),
             )
