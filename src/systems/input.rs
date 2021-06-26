@@ -37,5 +37,8 @@ pub fn player_input_system(
         if thrust.thrust < 0.0 {
             thrust.thrust = 0.0;
         }
+        if thrust.thrust > 100.0 {
+            thrust.thrust = 100.0;
+        }
     }
 }
