@@ -19,7 +19,7 @@ pub fn setup(
 
 fn add_camera(mut commands: Commands) -> Commands {
     let mut camera = OrthographicCameraBundle::new_2d();
-    camera.orthographic_projection.scale = 0.1;
+    camera.orthographic_projection.scale = 0.2;
     camera.transform = Transform::from_xyz(0.0, 0.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y);
 
     commands.spawn_bundle(camera);
@@ -42,9 +42,8 @@ fn add_player(mut commands: Commands) -> Commands {
                 Transform::from_xyz(0.0, 15.0, 0.0),
             )
         )
-        .insert(entities::Player { 
-            
-        })
+        .insert(entities::Player {})
+        .insert(entities::PositionHistory::new(0.02, 100, Vec2::new(0.0, 15.0)))
         .insert(physical_attributes::Thrust {
             thrust: 0.0,
             facing: 0.0,

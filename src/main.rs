@@ -17,5 +17,6 @@ fn main() {
         .add_system(physics::thrust_system.system())
         .add_system(physics::gravity_system.system())
         .add_system(physics::velocity_system.system())
+        .add_system(trail::trail_system.system())
         .run();
 }
