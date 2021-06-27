@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_prototype_lyon::prelude::*;
 
-use crate::entities;
+use crate::components::entities;
 
 pub fn trail_system(
     mut commands: Commands,

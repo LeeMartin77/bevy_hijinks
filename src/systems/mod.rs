@@ -1,3 +1,5 @@
+pub mod orbital_plugin;
+
 pub mod physics;
 pub mod setup;
 pub mod input;

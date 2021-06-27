@@ -1,5 +1,5 @@
 [package]
-name = "bevy_hijinks"
+name = "orbital_bevy"
 version = "0.1.0"
 authors = ["Lee Martin <lee.martin@pliminus.co.uk>"]
 edition = "2018"
