@@ -16,6 +16,15 @@ pub fn setup(
     add_camera(commands);
 }
 
+//TODO: This is hideous, find a better way of doing this. Resource?
+pub fn starting_transform() -> Transform {
+    Transform::from_xyz(0.0, 15.0, 0.0)
+}
+
+pub fn starting_velocity() -> physical_attributes::Velocity {
+    physical_attributes::Velocity::new(15.0, 0.0)
+}
+
 fn add_camera(mut commands: Commands) -> Commands {
     let mut camera = OrthographicCameraBundle::new_2d();
     camera.orthographic_projection.scale = 0.2;
@@ -38,7 +47,7 @@ fn add_player(mut commands: Commands) -> Commands {
                 &player_shape,
                 ShapeColors::new(Color::BLACK),
                 DrawMode::Fill(FillOptions::default()),
-                Transform::from_xyz(0.0, 15.0, 0.0),
+                starting_transform(),
             )
         )
         .insert(entities::Player {})
@@ -47,7 +56,7 @@ fn add_player(mut commands: Commands) -> Commands {
             thrust: 0.0,
             facing: 0.0,
         })
-        .insert(physical_attributes::Velocity::new(15.0, 0.0))
+        .insert(starting_velocity())
         .insert(physical_attributes::Gravity::Movable(physical_attributes::MassRadius {
             radius: player_radius,
             mass: 0.0001
