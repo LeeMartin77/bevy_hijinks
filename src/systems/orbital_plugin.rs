@@ -9,6 +9,7 @@ impl Plugin for OrbitalPlugin {
         app
             .insert_resource(GameState::new())
             .add_startup_system(setup::setup.system())
+            .add_system(gamestate::gamestate_system.system())
             .add_system(input::player_input_system.system())
             .add_system(physics::thrust_system.system())
             .add_system(physics::gravity_system.system())
