@@ -26,5 +26,15 @@ pub struct Thrust {
 }
 
 pub struct Velocity {
-    pub velocity: Vec3
+    pub velocity: Vec3,
+    pub crashed: bool
+}
+
+impl Velocity {
+    pub fn new(x: f32, y: f32) -> Velocity {
+        Velocity {
+            velocity: Vec3::new(x, y, 0.0),
+            crashed: false
+        }
+    }
 }

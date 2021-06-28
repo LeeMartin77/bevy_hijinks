@@ -25,5 +25,6 @@ impl PositionHistory {
     }
 }
 
-pub struct Planet {
+pub enum Planet {
+    Starting
 }

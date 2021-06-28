@@ -50,9 +50,8 @@ pub fn gravity_system(
             let distance_between_objects = distance_between_two_vec(planet_translation, object_transform.translation);
             if distance_between_objects <= (planet_mass_radius.radius + object_mass_radius.radius) {
                 // object has crashed - it needs to stop moving
-                velocity.velocity.x = 0.0;
-                velocity.velocity.y = 0.0;
-                velocity.velocity.z = 0.0;
+                velocity.velocity = Vec3::new(0.0, 0.0, 0.0);
+                velocity.crashed = true;
                 continue;
             }
             let force = GRAVITATIONAL_CONSTANT * ((object_mass_radius.mass * planet_mass_radius.mass) / distance_between_objects.powi(2));

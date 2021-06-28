@@ -11,8 +11,7 @@ pub fn setup(
     let planet_radius = 10.0;
     let planet_density = 12000000000.0;
 
-    commands = add_planet(commands, planet_radius, planet_density, 0.0, 0.0);
-    commands = add_planet(commands, planet_radius, planet_density, 45.0, 0.0);
+    commands = add_starting_planet(commands, planet_radius, planet_density, 0.0, 0.0);
 
     add_camera(commands);
 }
@@ -48,9 +47,7 @@ fn add_player(mut commands: Commands) -> Commands {
             thrust: 0.0,
             facing: 0.0,
         })
-        .insert(physical_attributes::Velocity {
-            velocity: Vec3::new(15.0, 0.0, 0.0),
-        })
+        .insert(physical_attributes::Velocity::new(15.0, 0.0))
         .insert(physical_attributes::Gravity::Movable(physical_attributes::MassRadius {
             radius: player_radius,
             mass: 0.0001
@@ -59,7 +56,7 @@ fn add_player(mut commands: Commands) -> Commands {
 }
 
 
-fn add_planet(mut commands: Commands, planet_radius: f32, planet_density: f32, x: f32, y: f32) -> Commands {
+fn add_starting_planet(mut commands: Commands, planet_radius: f32, planet_density: f32, x: f32, y: f32) -> Commands {
     let planet_circle = shapes::Circle {
         radius: planet_radius,
         ..shapes::Circle::default()
@@ -73,7 +70,7 @@ fn add_planet(mut commands: Commands, planet_radius: f32, planet_density: f32, x
                 Transform::from_xyz(x, y, 0.0),
             )
         )
-        .insert(entities::Planet { })
+        .insert(entities::Planet::Starting)
         .insert(physical_attributes::Gravity::Immovable(physical_attributes::MassRadius::from_density(planet_density, planet_radius)));
     commands
 }
