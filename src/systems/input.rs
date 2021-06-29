@@ -13,7 +13,7 @@ pub fn player_input_system(
     time: Res<Time>,
     gamestate: ResMut<GameState>,
     keyboard_input: Res<Input<KeyCode>>,
-    query: Query<(&entities::Player, &mut physical_attributes::Velocity, &mut physical_attributes::Thrust, &mut Transform)>,
+    query: Query<(&entities::Player, &mut entities::PositionHistory, &mut physical_attributes::Velocity, &mut physical_attributes::Thrust, &mut Transform)>,
 ) {
     match gamestate.play_state {
         PlayState::Playing => handle_gameplay_input(time, keyboard_input, query),
@@ -21,8 +21,8 @@ pub fn player_input_system(
     } 
 }
 
-fn handle_gameplay_input(time: Res<Time>, keyboard_input: Res<Input<KeyCode>>, mut query: Query<(&entities::Player, &mut physical_attributes::Velocity, &mut physical_attributes::Thrust, &mut Transform)>){
-    if let Ok((_player, _velocity, mut thrust, mut transform)) = query.single_mut() {
+fn handle_gameplay_input(time: Res<Time>, keyboard_input: Res<Input<KeyCode>>, mut query: Query<(&entities::Player, &mut entities::PositionHistory, &mut physical_attributes::Velocity, &mut physical_attributes::Thrust, &mut Transform)>){
+    if let Ok((_player, _position_history, _velocity, mut thrust, mut transform)) = query.single_mut() {
         let mut rotate: bool = false;
         if keyboard_input.pressed(KeyCode::Left) {
             thrust.facing -= PLAYER_TURN_RATE * time.delta_seconds();
@@ -54,16 +54,21 @@ fn handle_gameplay_input(time: Res<Time>, keyboard_input: Res<Input<KeyCode>>, m
     }
 }
 
-fn handle_crashed_input(keyboard_input: Res<Input<KeyCode>>, mut query: Query<(&entities::Player, &mut physical_attributes::Velocity, &mut physical_attributes::Thrust, &mut Transform)>, mut gamestate: ResMut<GameState>){
+fn handle_crashed_input(keyboard_input: Res<Input<KeyCode>>, query: Query<(&entities::Player, &mut entities::PositionHistory, &mut physical_attributes::Velocity, &mut physical_attributes::Thrust, &mut Transform)>, gamestate: ResMut<GameState>){
     if keyboard_input.pressed(KeyCode::R) {
-        if let Ok((_player, mut velocity, mut thrust, mut transform)) = query.single_mut() {
-            thrust.thrust = 0.0;
-            thrust.facing = 0.0;
-            velocity.velocity = starting_velocity().velocity;
-            velocity.crashed = false;
-            transform.rotation = starting_transform().rotation;
-            transform.translation = starting_transform().translation;
-            gamestate.play_state = PlayState::Playing;
-        }
+        reset_player(query, gamestate);
+    }
+}
+
+fn reset_player(mut query: Query<(&entities::Player, &mut entities::PositionHistory, &mut physical_attributes::Velocity, &mut physical_attributes::Thrust, &mut Transform)>, mut gamestate: ResMut<GameState>) {
+    if let Ok((_player, mut position_history, mut velocity, mut thrust, mut transform)) = query.single_mut() {
+        thrust.thrust = 0.0;
+        thrust.facing = 0.0;
+        velocity.velocity = starting_velocity().velocity;
+        velocity.crashed = false;
+        transform.rotation = starting_transform().rotation;
+        transform.translation = starting_transform().translation;
+        position_history.history = vec![Vec2::new(transform.translation.x, transform.translation.y); position_history.history_length.into()];
+        gamestate.play_state = PlayState::Playing;
     }
 }

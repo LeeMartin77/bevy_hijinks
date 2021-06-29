@@ -3,8 +3,13 @@ use bevy_prototype_lyon::prelude::*;
 
 use crate::components::*;
 
+pub enum UiTextElements {
+    RestartText
+}
+
 pub fn setup(
-    mut commands: Commands
+    mut commands: Commands,
+    asset_server: Res<AssetServer>
 ) {
     commands.add_player();
 
@@ -16,6 +21,34 @@ pub fn setup(
     commands.add_camera();
 
     commands.spawn_bundle(UiCameraBundle::default());
+
+    commands
+    .spawn_bundle(TextBundle {
+            style: Style {
+                align_self: AlignSelf::FlexEnd,
+                position_type: PositionType::Absolute,
+                position: Rect {
+                    bottom: Val::Px(5.0),
+                    right: Val::Px(15.0),
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+            text: Text::with_section(
+                "Press R To Restart",
+                TextStyle {
+                    font: asset_server.load("fonts/ShareTechMono-Regular.ttf"),
+                    font_size: 20.0,
+                    color: Color::WHITE,
+                },
+                TextAlignment {
+                    horizontal: HorizontalAlign::Center,
+                    ..Default::default()
+                },
+            ),
+            ..Default::default()
+        })
+        .insert(UiTextElements::RestartText);
 }
 
 //TODO: This is hideous, find a better way of doing this. Resource?

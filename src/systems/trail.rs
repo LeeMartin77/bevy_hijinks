@@ -16,7 +16,7 @@ pub fn trail_system(
             new_history.push(Vec2::new(transform.translation.x, transform.translation.y));
             let mut iterator: usize = 0;
             for item in &position_history.history {
-                if iterator < position_history.history_int.into() {
+                if iterator < position_history.history_length.into() {
                     new_history.push(*item)
                 }
                 iterator += 1;
