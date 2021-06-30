@@ -1,15 +1,28 @@
 use bevy::prelude::*;
 
 use crate::components::ui::*;
-use crate::components::resources::GameState;
+use crate::components::resources::*;
 
 pub fn ui_system(
     mut _commands: Commands,
     _time: Res<Time>,
-    _gamestate: ResMut<GameState>,
-    mut _query: Query<()>,
+    gamestate: ResMut<GameState>,
+    mut query: Query<(&UiTextElements, &mut Visible)>,
 ) {
+    for (text_element, visible) in query.iter_mut() {
+        match text_element {
+            UiTextElements::RestartText => update_restart_text(&gamestate, visible)
+        }
+    }
+}
 
+fn update_restart_text(gamestate: &ResMut<GameState>, mut visible: Mut<Visible>){
+    if matches!(gamestate.play_state, PlayState::Crashed) && !visible.is_visible {
+        visible.is_visible = true;
+    }
+    if visible.is_visible && !matches!(gamestate.play_state, PlayState::Crashed) {
+        visible.is_visible = false;
+    }
 }
 
 pub trait UiExtensions {
@@ -41,6 +54,10 @@ impl UiExtensions for Commands<'_> {
                         ..Default::default()
                     },
                 ),
+                visible: Visible {
+                    is_visible: false,
+                    ..Visible::default()
+                },
                 ..Default::default()
             })
             .insert(UiTextElements::RestartText);
