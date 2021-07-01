@@ -1,7 +1,11 @@
 use bevy::prelude::*;
 
-use crate::components::ui::*;
 use crate::components::resources::*;
+
+pub enum UiTextElements {
+    RestartText
+}
+
 
 pub fn ui_system(
     mut _commands: Commands,
