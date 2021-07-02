@@ -40,7 +40,7 @@ trait SetupExtensions {
 impl SetupExtensions for Commands<'_> {
     fn add_camera(&mut self) {
         let mut camera = OrthographicCameraBundle::new_2d();
-        camera.orthographic_projection.scale = 0.2;
+        camera.orthographic_projection.scale = 0.4;
         camera.transform = Transform::from_xyz(0.0, 0.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y);
     
         self.spawn_bundle(camera);
