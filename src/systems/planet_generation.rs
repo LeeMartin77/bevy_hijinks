@@ -9,7 +9,7 @@ use rand_pcg::Pcg64;
 
 const CHUNK_SIZE: f32 = 40.0;
 // We want some margin between chunks
-const HALF_CHUNK_ACTIVE: f32 = 10.0;
+const HALF_CHUNK_ACTIVE: f32 = 5.0;
 
 const GENERATION_RANGE: i32 = 10;
 
@@ -71,7 +71,7 @@ pub fn planet_generation_system(
             }
             //generate planet 25% of the time
             let generate: f32 = planet_generation_data.world_rng.gen();
-            if generate > 0.75 {
+            if generate > 0.9 {
 
                 let x_deviation: f32 = planet_generation_data.world_rng.gen_range(-1.0..1.0);
                 let y_deviation: f32 = planet_generation_data.world_rng.gen_range(-1.0..1.0);

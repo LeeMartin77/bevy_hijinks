@@ -1,3 +1,4 @@
+use bevy::utils::Uuid;
 use bevy::prelude::*;
 use crate::systems::*;
 use crate::components::resources::GameState;
@@ -9,7 +10,7 @@ impl Plugin for OrbitalPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app
             .insert_resource(GameState::new())
-            .insert_resource(PlanetGenerationData::new("HoopyFrood".into()))
+            .insert_resource(PlanetGenerationData::new(Uuid::new_v4().to_string()))
             .add_startup_system(setup::setup.system())
             .add_system_set(
                 SystemSet::new()
